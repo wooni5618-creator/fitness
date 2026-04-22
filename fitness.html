@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>운동체력 향상 활동 만들기</title>
+<script>
+  // 🔴 중요: 여기에 1단계에서 복사한 웹 앱 URL을 붙여넣으세요!
+  const API_URL = "https://script.google.com/macros/s/AKfycbwNWUBEWqrAf-r8izMcQLt3CeDnw9_Dyip25tB-YQ07iP8AQoOYKXEfsljecaiPqNeqdw/exec";
+</script>
+<style>
+/* (선생님이 업로드하신 파일의 모든 스타일을 그대로 포함합니다) */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#1A1A2E;--blue:#0F3460;--yellow:#D4820A;--red:#C0392B;
+  --teal:#0096B4;--green:#1E8449;--white:#fff;--light:#F0F4FF;
+  --bg:#F5F7FF;--card:#fff;--border:#DDE3F0;--text:#1A1A2E;--muted:#6B7A99;
+}
+body{font-family:'Malgun Gothic','맑은 고딕',Apple SD Gothic Neo,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent}
+.hdr{background:linear-gradient(135deg,#1A1A2E 0%,#0F3460 100%);color:#fff;padding:16px 18px 12px;text-align:center;box-shadow:0 2px 16px rgba(15,52,96,.35)}
+.hdr h1{font-size:19px;font-weight:800;letter-spacing:-.4px}
+.hdr p{font-size:11px;color:#8AACDD;margin-top:3px}
+.stepbar{display:flex;align-items:center;justify-content:center;gap:4px;padding:12px 14px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.sdot{display:flex;flex-direction:column;align-items:center;gap:3px}
+.snum{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid #DDE3F0;color:#8892A4;background:#F5F7FF;transition:all .25s}
+.snum.act{background:#0F3460;border-color:#0F3460;color:#fff;box-shadow:0 0 0 3px rgba(15,52,96,.18)}
+.snum.done{background:#1E8449;border-color:#1E8449;color:#fff}
+.sline{width:22px;height:2px;background:#DDE3F0;margin-bottom:14px;transition:background .25s}
+.sline.done{background:#1E8449}
+.slbl{font-size:9px;color:#8892A4;max-width:46px;text-align:center;line-height:1.3}
+.slbl.act{color:#0F3460;font-weight:700}
+.page{display:none;padding:14px 14px 24px;max-width:580px;margin:0 auto}
+.page.show{display:block}
+.sec-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;margin-top:2px}
+.sec-sub{font-size:11px;color:var(--muted);margin-bottom:13px}
+.fc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fc{border-radius:16px;padding:18px 10px 14px;text-align:center;cursor:pointer;border:2.5px solid var(--border);transition:all .2s;background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.fc:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
+.fc.sel{transform:translateY(-2px) scale(1.02)}
+.fc .ic{font-size:34px;margin-bottom:7px}
+.fc .nm{font-size:17px;font-weight:800}
+.fc .ds{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5}
+.fc .bar{height:3px;border-radius:2px;margin-top:10px;opacity:.3;transition:opacity .2s}
+.fc.sel .bar{opacity:1}
+.fc-pow .nm{color:#D4820A}.fc-pow .bar{background:#D4820A}.fc-pow.sel{border-color:#D4820A;box-shadow:0 4px 20px rgba(212,130,10,.22)}
+.fc-agi .nm{color:#C0392B}.fc-agi .bar{background:#C0392B}.fc-agi.sel{border-color:#C0392B;box-shadow:0 4px 20px rgba(192,57,43,.22)}
+.fc-cor .nm{color:#0096B4}.fc-cor .bar{background:#0096B4}.fc-cor.sel{border-color:#0096B4;box-shadow:0 4px 20px rgba(0,150,180,.22)}
+.fc-bal .nm{color:#1E8449}.fc-bal .bar{background:#1E8449}.fc-bal.sel{border-color:#1E8449;box-shadow:0 4px 20px rgba(30,132,73,.22)}
+.eq-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.eq{border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;border:2.5px solid var(--border);transition:all .2s;background:var(--card);position:relative;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.eq.sel{border-color:#0F3460;background:#EEF3FF;box-shadow:0 0 0 2px rgba(15,52,96,.15)}
+.eq svg{width:42px;height:42px;margin:0 auto 4px;display:block}
+.eq .enm{font-size:10px;font-weight:700;color:var(--text);line-height:1.3}
+.ck{display:none;position:absolute;top:3px;right:3px;width:16px;height:16px;background:#1E8449;border-radius:50%;color:#fff;font-size:9px;align-items:center;justify-content:center;font-weight:700}
+.eq.sel .ck{display:flex}
+.eq-custom input{width:100%;border:none;background:transparent;text-align:center;font-size:10px;font-weight:700;outline:none}
+.act-box{background:var(--card);border-radius:14px;padding:15px;border:1px solid var(--border);margin-bottom:11px}
+.act-box h3{font-size:13px;font-weight:700;margin-bottom:9px;color:var(--muted)}
+.act-box textarea{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px;font-size:13px;background:#F9FAFF;resize:none}
+.char-count{font-size:10px;color:#aaa;text-align:right;margin-top:3px}
+.hint-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.chip{padding:4px 10px;border-radius:20px;font-size:10px;cursor:pointer;border:1.5px solid var(--border);background:#F0F4FF;color:#0F3460;font-weight:600}
+.send-box{background:linear-gradient(135deg,#1A1A2E,#0F3460);border-radius:16px;padding:18px;color:#fff;margin-bottom:12px}
+.name-in{width:100%;padding:12px;border-radius:9px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.09);color:#fff;margin-bottom:10px}
+.send-btn{width:100%;padding:14px;background:#00B4D8;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer}
+.nav{display:flex;gap:8px;margin-top:14px}
+.btn-back{flex:1;padding:13px;background:var(--card);border:1.5px solid var(--border);border-radius:10px}
+.btn-next{flex:2;padding:13px;background:#0F3460;color:#fff;border-radius:10px}
+.btn-next:disabled{background:#DDE3F0;color:#aaa}
+.tv{display:none;min-height:100vh}
+.tv-hdr{background:linear-gradient(135deg,#1A1A2E,#0F3460);color:#fff;padding:16px 18px}
+.tv-stats{display:flex;gap:7px;padding:12px 14px;background:#F0F4FF}
+.tv-stat{flex:1;background:#fff;border-radius:10px;padding:9px 6px;text-align:center;border:1px solid var(--border)}
+.tv-stat .n{font-size:22px;font-weight:800;color:#0F3460}
+.tv-card{background:#fff;border-radius:13px;margin:9px 14px;padding:14px;border:1px solid var(--border)}
+.tv-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;color:#fff;margin-bottom:6px}
+.tv-sec{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
+.tv-sec h4{font-size:10px;color:var(--muted)}
+.tv-sec p{font-size:13px;white-space:pre-wrap}
+.badge-live{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:#E8F8F0;color:#1E8449;font-size:11px;font-weight:700}
+.dot-live{width:7px;height:7px;border-radius:50%;background:#1E8449;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+
+<div class="tv" id="tv">
+  <div class="tv-hdr">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><h1>📋 학생 제출 현황</h1><p id="tv-time">불러오는 중...</p></div>
+      <span class="badge-live"><span class="dot-live"></span>실시간</span>
+    </div>
+  </div>
+  <div class="tv-stats">
+    <div class="tv-stat"><div class="n" id="tv-total">0</div><div style="font-size:9px">전체</div></div>
+    <div class="tv-stat"><div class="n" id="tv-pow" style="color:#D4820A">0</div><div style="font-size:9px">순발력</div></div>
+    <div class="tv-stat"><div class="n" id="tv-agi" style="color:#C0392B">0</div><div style="font-size:9px">민첩성</div></div>
+    <div class="tv-stat"><div class="n" id="tv-cor" style="color:#0096B4">0</div><div style="font-size:9px">협응성</div></div>
+    <div class="tv-stat"><div class="n" id="tv-bal" style="color:#1E8449">0</div><div style="font-size:9px">평형성</div></div>
+  </div>
+  <div style="padding:10px 14px"><button onclick="loadTeacher()" style="padding:8px 15px; border-radius:8px; border:1px solid #ddd; background:#fff; font-weight:bold; cursor:pointer">🔄 새로고침</button></div>
+  <div id="tv-list"></div>
+</div>
+
+<div id="sv">
+  <div class="hdr"><h1>🏃 운동체력 향상 활동 만들기</h1><p>나만의 운동 프로그램을 직접 설계해요!</p></div>
+  <div class="stepbar">
+    <div class="sdot"><div class="snum act" id="d1">1</div><div class="slbl act" id="l1">체력 선택</div></div>
+    <div class="sline" id="ln1"></div>
+    <div class="sdot"><div class="snum" id="d2">2</div><div class="slbl" id="l2">교구 선택</div></div>
+    <div class="sline" id="ln2"></div>
+    <div class="sdot"><div class="snum" id="d3">3</div><div class="slbl" id="l3">활동 만들기</div></div>
+    <div class="sline" id="ln3"></div>
+    <div class="sdot"><div class="snum" id="d4">4</div><div class="slbl" id="l4">전송</div></div>
+  </div>
+
+  <div class="page show" id="p1">
+    <div class="sec-title">⚡ 기르고 싶은 운동체력은?</div>
+    <div class="fc-grid">
+      <div class="fc fc-pow" onclick="selFit('pow',this)"><div class="ic">⚡</div><div class="nm">순발력</div><div class="ds">짧은 시간에 강하고 빠르게 힘내기</div><div class="bar"></div></div>
+      <div class="fc fc-agi" onclick="selFit('agi',this)"><div class="ic">🏃</div><div class="nm">민첩성</div><div class="ds">몸의 방향을 빠르고 정확하게 바꾸기</div><div class="bar"></div></div>
+      <div class="fc fc-cor" onclick="selFit('cor',this)"><div class="ic">🎯</div><div class="nm">협응성</div><div class="ds">눈·손·발이 조화롭게 함께 움직이기</div><div class="bar"></div></div>
+      <div class="fc fc-bal" onclick="selFit('bal',this)"><div class="ic">⚖️</div><div class="nm">평형성</div><div class="ds">몸의 균형을 유지하는 능력</div><div class="bar"></div></div>
+    </div>
+    <div class="nav"><button class="btn-next" id="n1" onclick="go(2)" disabled>다음 단계 →</button></div>
+  </div>
+
+  <div class="page" id="p2">
+    <div class="sec-title">🎒 사용할 교구를 골라요</div>
+    <div class="eq-grid" id="eqgrid"></div>
+    <div class="nav"><button class="btn-back" onclick="go(1)">← 이전</button><button class="btn-next" id="n2" onclick="go(3)" disabled>다음 단계 →</button></div>
+  </div>
+
+  <div class="page" id="p3">
+    <div class="sec-title">✏️ 활동을 직접 만들어요!</div>
+    <div class="act-box"><h3>🏷️ 활동 이름</h3><textarea id="t-title" rows="2" maxlength="60" oninput="onTA('title',60)"></textarea></div>
+    <div class="act-box"><h3>🎯 활동 목표</h3><textarea id="t-goal" rows="3" maxlength="150" oninput="onTA('goal',150)"></textarea></div>
+    <div class="act-box"><h3>📋 활동 방법</h3><textarea id="t-how" rows="5" maxlength="500" oninput="onTA('how',500)"></textarea><div class="hint-row" id="hints"></div></div>
+    <div class="act-box"><h3>⚠️ 안전 주의사항</h3><textarea id="t-safe" rows="2" maxlength="150" oninput="onTA('safe',150)"></textarea></div>
+    <div class="nav"><button class="btn-back" onclick="go(2)">← 이전</button><button class="btn-next" id="n3" onclick="go(4)" disabled>전송 단계 →</button></div>
+  </div>
+
+  <div class="page" id="p4">
+    <div class="send-box" id="send-box">
+      <h3>📤 선생님께 전송하기</h3>
+      <input class="name-in" id="sname" placeholder="이름 (예: 홍길동)" />
+      <button class="send-btn" onclick="doSend()">✅ 선생님께 전송하기</button>
+    </div>
+    <div id="succ-area" style="display:none; text-align:center">
+      <h2>🎉 전송 완료!</h2><button onclick="location.reload()" style="margin-top:15px; padding:10px 20px">처음으로</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EQUIPMENTS = [
+  {id:'cone',name:'꼬깔콘',svg:`<svg viewBox="0 0 44 44"><polygon points="22,4 6,40 38,40" fill="#E55A22"/><rect x="4" y="40" width="36" height="4" rx="2" fill="#FFB347"/></svg>`},
+  {id:'ball_soccer',name:'축구공',svg:`<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="#fff" stroke="#bbb" stroke-width="1.5"/><polygon points="22,8 16,16 28,16" fill="#333"/><polygon points="10,22 16,16 13,26" fill="#333"/><polygon points="34,22 28,16 31,26" fill="#333"/><polygon points="15,34 13,26 22,30" fill="#333"/><polygon points="29,34 31,26 22,30" fill="#333"/></svg>`},
+  {id:'ball_basket',name:'농구공',svg:`<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="#E55A22" stroke="#C04010" stroke-width="1"/><path d="M22,4 Q22,22 22,40" fill="none" stroke="#C04010" stroke-width="1.5"/><path d="M4,22 Q22,22 40,22" fill="none" stroke="#C04010" stroke-width="1.5"/></svg>`},
+  {id:'hoop',name:'훌라후프',svg:`<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#00B4D8" stroke-width="5"/></svg>`},
+  {id:'rope',name:'줄넘기',svg:`<svg viewBox="0 0 44 44"><rect x="2" y="18" width="8" height="14" rx="4" fill="#8B4513"/><path d="M10,22 Q22,8 34,22" fill="none" stroke="#555" stroke-width="2.5"/></svg>`},
+  {id:'mat',name:'체육매트',svg:`<svg viewBox="0 0 44 44"><rect x="4" y="14" width="36" height="20" rx="3" fill="#4ECDC4"/></svg>`},
+  {id:'stopwatch',name:'스톱워치',svg:`<svg viewBox="0 0 44 44"><circle cx="22" cy="26" r="15" fill="#eee" stroke="#999"/><line x1="22" y1="26" x2="22" y2="16" stroke="#333" stroke-width="2"/></svg>`},
+  {id:'custom',name:'직접 입력',svg:`<svg viewBox="0 0 44 44"><rect x="8" y="8" width="28" height="28" rx="5" fill="none" stroke="#aaa" stroke-dasharray="4,3"/></svg>`},
+];
+
+const HINTS={
+  pow:['신호 맞춰 출발하기','힘껏 멀리 던지기','최대한 빠르게 달리기'],
+  agi:['지그재그로 통과하기','방향 바꿔 달리기','셔틀런 반복하기'],
+  cor:['주고받기 패스하기','정확히 맞히기','짝과 함께하기'],
+  bal:['한 발로 버티기','천천히 이동하기','10초 유지하기'],
+};
+const FI={pow:{label:'순발력',color:'#D4820A'},agi:{label:'민첩성',color:'#C0392B'},cor:{label:'협응성',color:'#0096B4'},bal:{label:'평형성',color:'#1E8449'}};
+let ST={fit:null,eq:[],customEq:''};
+let DB=[];
+
+function init(){
+  if(location.search.includes('teacher')){
+    document.getElementById('sv').style.display='none';
+    document.getElementById('tv').style.display='block';
+    loadTeacher();
+    setInterval(loadTeacher, 10000); // 10초마다 자동 갱신
+    return;
+  }
+  buildEquip();
+}
+
+function buildEquip(){
+  document.getElementById('eqgrid').innerHTML=EQUIPMENTS.map(e=>{
+    if(e.id==='custom') return `<div class="eq eq-custom" id="eq-custom" onclick="toggleCustom(this)"><div class="ck">✓</div>${e.svg}<div class="enm"><input id="ci" placeholder="입력" onclick="event.stopPropagation()" oninput="onCI(this)" maxlength="10"/></div></div>`;
+    return `<div class="eq" id="eq-${e.id}" onclick="toggleEq('${e.id}',this)"><div class="ck">✓</div>${e.svg}<div class="enm">${e.name}</div></div>`;
+  }).join('');
+}
+
+function toggleEq(id,el){ el.classList.toggle('sel'); ST.eq=ST.eq.includes(id)?ST.eq.filter(x=>x!==id):[...ST.eq,id]; chkEq(); }
+function toggleCustom(el){ el.classList.toggle('sel'); if(!el.classList.contains('sel')) ST.customEq=''; chkEq(); }
+function onCI(inp){ ST.customEq=inp.value.trim(); document.getElementById('eq-custom').classList.toggle('sel',!!ST.customEq); chkEq(); }
+function chkEq(){ document.getElementById('n2').disabled=ST.eq.length===0&&!ST.customEq; }
+function selFit(type,el){ document.querySelectorAll('.fc').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); ST.fit=type; document.getElementById('n1').disabled=false; }
+
+function go(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
+  document.getElementById('p'+n).classList.add('show');
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('d'+i);
+    d.className='snum'+(i<n?' done':i===n?' act':'');
+    if(i<4) document.getElementById('ln'+i).className='sline'+(i<n?' done':'');
+  }
+  if(n===3) {
+    document.getElementById('hints').innerHTML=(HINTS[ST.fit]||[]).map(h=>`<span class="chip" onclick="addHint('${h}')">${h}</span>`).join('');
+  }
+  window.scrollTo(0,0);
+}
+
+function addHint(text){ const ta=document.getElementById('t-how'); ta.value+=(ta.value?'\n':'')+text; chkS3(); }
+function onTA(){ chkS3(); }
+function chkS3(){ document.getElementById('n3').disabled=!['t-title','t-how'].every(id=>document.getElementById(id).value.trim()); }
+
+// 🌐 실시간 전송 (학생)
+async function doSend(){
+  const name=document.getElementById('sname').value.trim();
+  if(!name){alert('이름을 입력해주세요!');return;}
+  
+  const eqNames=[...ST.eq.map(id=>EQUIPMENTS.find(e=>e.id===id)?.name),ST.customEq].filter(Boolean).join(', ');
+  const rec={
+    name, fitLabel:FI[ST.fit].label, equipment:eqNames,
+    title:document.getElementById('t-title').value,
+    goal:document.getElementById('t-goal').value,
+    how:document.getElementById('t-how').value,
+    safe:document.getElementById('t-safe').value,
+    time:new Date().toLocaleString('ko-KR')
+  };
+
+  const btn = document.querySelector('.send-btn');
+  btn.disabled = true; btn.textContent = "전송 중...";
+
+  try {
+    await fetch(API_URL, { method: 'POST', body: JSON.stringify(rec) });
+    document.getElementById('send-box').style.display='none';
+    document.getElementById('succ-area').style.display='block';
+  } catch(e) {
+    alert("오류 발생! 다시 시도해주세요.");
+    btn.disabled = false; btn.textContent = "선생님께 전송하기";
+  }
+}
+
+// 🌐 실시간 로드 (교사)
+async function loadTeacher(){
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    DB = data.slice(1).reverse(); // 첫 행(헤더) 제외하고 역순
+    renderTeacher();
+    document.getElementById('tv-time').textContent='업데이트: '+new Date().toLocaleTimeString();
+  } catch(e) { console.error("로드 실패"); }
+}
+
+function renderTeacher(){
+  let counts = { '순발력':0, '민첩성':0, '협응성':0, '평형성':0 };
+  const listHTML = DB.map(r => {
+    counts[r[1]]++;
+    let color = r[1]==='순발력'?'#D4820A':r[1]==='민첩성'?'#C0392B':r[1]==='협응성'?'#0096B4':'#1E8449';
+    return `<div class="tv-card">
+      <span class="tv-badge" style="background:${color}">${r[1]}</span>
+      <div style="font-weight:bold; font-size:17px">${r[0]}</div>
+      <div style="font-size:11px; color:#666">🎒 ${r[2]} | 🕐 ${r[7]}</div>
+      <div class="tv-sec"><h4>활동 이름</h4><p>${r[3]}</p></div>
+      <div class="tv-sec"><h4>방법</h4><p>${r[5]}</p></div>
+    </div>`;
+  }).join('');
+  
+  document.getElementById('tv-total').textContent = DB.length;
+  document.getElementById('tv-pow').textContent = counts['순발력'];
+  document.getElementById('tv-agi').textContent = counts['민첩성'];
+  document.getElementById('tv-cor').textContent = counts['협응성'];
+  document.getElementById('tv-bal').textContent = counts['평형성'];
+  document.getElementById('tv-list').innerHTML = listHTML || '<div style="text-align:center; padding:50px">제출된 데이터가 없습니다.</div>';
+}
+
+init();
+</script>
+</body>
+</html>
