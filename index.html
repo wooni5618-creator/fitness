@@ -101,8 +101,11 @@
       <input id="sname" style="width:100%; padding:12px; margin:15px 0; border-radius:8px; border:none;" placeholder="이름을 입력하세요">
       <button class="send-btn" onclick="doSend()">✅ 제출하기</button>
     </div>
-    <div id="succ-area" style="display:none; text-align:center; padding:40px">
-      <div style="font-size:50px">🎉</div><h2>전송 완료!</h2>
+    <div id="succ-area" style="display:none; text-align:center; padding:30px">
+      <div style="font-size:50px">🎉</div>
+      <h2 style="margin-bottom:10px">전송 완료!</h2>
+      <p style="color:var(--muted); font-size:14px">활동이 선생님께 잘 전달되었습니다.</p>
+      <button onclick="resetForm()" style="margin-top:25px; padding:12px 24px; background:var(--blue); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer; box-shadow:0 4px 10px rgba(15,52,96,0.2)">➕ 다른 활동 또 만들기</button>
     </div>
   </div>
 </div>
@@ -111,7 +114,7 @@
 const EQUIPMENTS = [
   {id:'cone', name:'꼬깔콘', icon:'📐'}, {id:'hoop', name:'훌라후프', icon:'⭕'}, {id:'rope', name:'줄넘기', icon:'➰'}, {id:'mat', name:'체육매트', icon:'🟦'},
   {id:'soccer', name:'축구공', icon:'⚽'}, {id:'basket', name:'농구공', icon:'🏀'}, {id:'voley', name:'배구공', icon:'🏐'}, {id:'disc', name:'디스크', icon:'💿'},
-  {id:'vest', name:'팀조끼', icon:'🎽'}, {id:'marker', name:'접시콘', icon:'🔘'}, {id:'ladder', name:'뜀틀', icon:'🪜'}, {id:'bean', name:'콩주머니', icon:'💰'},
+  {id:'vest', name:'팀조끼', icon:'🎽'}, {id:'marker', name:'접시콘', icon:'🔘'}, {id:'ladder', name:'뜀', icon:'🪜'}, {id:'bean', name:'콩주머니', icon:'💰'},
   {id:'watch', name:'초시계', icon:'⏱️'}, {id:'hurdle', name:'미니허들', icon:'🚧'}, 
   {id:'c1', name:'직접입력1', isCustom:true}, {id:'c2', name:'직접입력2', isCustom:true}
 ];
@@ -155,6 +158,7 @@ function go(n){
     const d=document.getElementById('d'+i); d.className='snum'+(i<n?' done':i===n?' act':'');
     if(i<4) document.getElementById('ln'+i).className='sline'+(i<n?' done':'');
   }
+  window.scrollTo(0,0);
 }
 
 function chkS3(){
@@ -182,6 +186,28 @@ async function doSend(){
     document.getElementById('send-box').style.display='none';
     document.getElementById('succ-area').style.display='block';
   } catch(e) { alert('전송 실패! 인터넷 연결을 확인해주세요.'); }
+}
+
+function resetForm() {
+  // 데이터 및 입력창 초기화 (이름은 다음 활동을 위해 유지함)
+  ST = {fit:null, eq:[], c1:'', c2:''};
+  ['t-title', 't-goal', 't-how', 't-safe', 'in-c1', 'in-c2'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+
+  // UI 상태 초기화
+  document.querySelectorAll('.fc').forEach(c => c.classList.remove('sel'));
+  document.querySelectorAll('.eq').forEach(e => e.classList.remove('sel'));
+  
+  document.getElementById('send-box').style.display = 'block';
+  document.getElementById('succ-area').style.display = 'none';
+
+  // 버튼 상태 초기화
+  document.getElementById('n1').disabled = true;
+  document.getElementById('n2').disabled = true;
+  document.getElementById('n3').disabled = true;
+
+  go(1); // 첫 페이지로 이동
 }
 
 async function loadTeacher(){
